@@ -215,7 +215,7 @@ def get_args():
                     csv_input.append('')
                     csv_input.append('<username>')
                     csv_input.append('<username>,<password>')
-                    csv_input.append('<ptc/gmail>,<username>,<password>')
+                    csv_input.append('<ptc/google>,<username>,<password>')
 
                     # If the number of fields is differend this is not a CSV
                     if num_fields != line.count(',') + 1:
@@ -255,8 +255,8 @@ def get_args():
 
                     # If the number of fields is three then assume this is "ptc,username,password". As requested..
                     if num_fields == 3:
-                        # If field 0 is not ptc or gmail something is wrong!
-                        if fields[0].lower() == 'ptc' or fields[0].lower() == 'gmail':
+                        # If field 0 is not ptc or google something is wrong!
+                        if fields[0].lower() == 'ptc' or fields[0].lower() == 'google':
                             args.auth_service.append(fields[0])
                         else:
                             field_error = 'method'
@@ -277,7 +277,7 @@ def get_args():
                     if field_error != '':
                         type_error = 'empty!'
                         if field_error == 'method':
-                            type_error = 'not ptc or gmail instead we got \'' + fields[0] + '\'!'
+                            type_error = 'not ptc or google instead we got \'' + fields[0] + '\'!'
                         print(sys.argv[0] + ": Error parsing CSV file on line " + str(num) + ". We found " + str(num_fields) + " fields, so your input should have looked like '" + csv_input[num_fields] + "'\nBut you gave us '" + line + "', your " + field_error + " was " + type_error)
                         sys.exit(1)
 
@@ -414,6 +414,34 @@ def get_pokemon_rarity(pokemon_id):
 def get_pokemon_types(pokemon_id):
     pokemon_types = get_pokemon_data(pokemon_id)['types']
     return map(lambda x: {"type": i8ln(x['type']), "color": x['color']}, pokemon_types)
+
+
+def get_moves_data(move_id):
+    if not hasattr(get_moves_data, 'moves'):
+        file_path = os.path.join(
+            config['ROOT_PATH'],
+            config['DATA_DIR'],
+            'moves.min.json')
+
+        with open(file_path, 'r') as f:
+            get_moves_data.moves = json.loads(f.read())
+    return get_moves_data.moves[str(move_id)]
+
+
+def get_move_name(move_id):
+    return i8ln(get_moves_data(move_id)['name'])
+
+
+def get_move_damage(move_id):
+    return i8ln(get_moves_data(move_id)['damage'])
+
+
+def get_move_energy(move_id):
+    return i8ln(get_moves_data(move_id)['energy'])
+
+
+def get_move_type(move_id):
+    return i8ln(get_moves_data(move_id)['type'])
 
 
 def get_encryption_lib_path(args):
