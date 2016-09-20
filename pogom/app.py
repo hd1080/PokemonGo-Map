@@ -228,7 +228,7 @@ class Pogom(Flask):
         valid_sort["id"] = {"display": "Pokedex Number", "selected": ("SELECTED" if sort == "id" else "")}
         valid_sort["name"] = {"display": "Pokemon Name", "selected": ("SELECTED" if sort == "name" else "")}
         if sort not in valid_sort:
-            valid_sort["count"]["selected"] = "SELECTED"
+            valid_sort["id"]["selected"] = "SELECTED"
         valid_order = OrderedDict()
         valid_order["asc"] = {"display": "Ascending", "selected": ("SELECTED" if order == "asc" else "")}
         valid_order["desc"] = {"display": "Descending", "selected": ("SELECTED" if order == "desc" else "")}
