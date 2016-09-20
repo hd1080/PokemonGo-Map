@@ -414,14 +414,14 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
             ${nameStr}
           </div>
           <div>
-            Level: ${gymLevel} - Free Slots: ${freeSlots} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
+            Level: ${gymLevel} - Free Slots: ${freeSlots} <br> Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
           </div>
           <div>
             ${memberStr}
           </div>
-          <div>
+          <!--<div>
             Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
-          </div>
+          </div>-->
           <div>
             Last Scanned: ${lastScannedStr}
           </div>
