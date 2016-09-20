@@ -399,6 +399,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
       </div>`
   } else {
     var gymLevel = getGymLevel(gymPoints)
+    var freeSlots = gymLevel - members.length
     str = `
       <div>
         <center>
@@ -413,7 +414,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
             ${nameStr}
           </div>
           <div>
-            Level: ${gymLevel} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
+            Level: ${gymLevel} - Free Slots: ${freeSlots} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
           </div>
           <div>
             ${memberStr}
