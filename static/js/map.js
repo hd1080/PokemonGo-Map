@@ -337,8 +337,8 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
       <small>
         <a href='https://pokemongo.gamepress.gg/pokemon/${id}' target='_blank' title='View in Pokedex'>#${id}</a>
       </small>
-      <span> ${rarityDisplay}</span>
-      <span> - </span>
+      <!--<span> ${rarityDisplay}</span>
+      <span> - </span>-->
       <small>${typesDisplay}</small>
     </div>
     <div>
