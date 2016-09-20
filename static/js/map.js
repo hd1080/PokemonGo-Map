@@ -1268,7 +1268,8 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
   data.done(function (result) {
     var gymLevel = getGymLevel(result.gym_points)
     var nextLvlPrestige = gymPrestige[gymLevel - 1] || 50000
-    var prestigePercentage = ((nextLvlPrestige - result.gym_points) / nextLvlPrestige) * 100
+    //var prestigePercentage = ((nextLvlPrestige - result.gym_points) / nextLvlPrestige) * 100
+    var prestigePercentage = (result.gym_points / nextLvlPrestige) * 100
     var lastScannedDate = new Date(result.last_scanned)
 
     var pokemonHtml = ''
