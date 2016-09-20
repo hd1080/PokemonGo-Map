@@ -346,14 +346,14 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
       <span class='label-countdown' disappears-at='${disappearTime}'>(00m00s)</span>
     </div>
     <div>
-      Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+      Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
     </div>
       ${details}
     <div>
       <a href='javascript:excludePokemon(${id})'>Exclude</a>&nbsp;&nbsp
       <a href='javascript:notifyAboutPokemon(${id})'>Notify</a>&nbsp;&nbsp
       <a href='javascript:removePokemonMarker("${encounterId}")'>Remove</a>&nbsp;&nbsp
-      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+      <!--<a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>-->
     </div>`
   return contentstring
 }
@@ -390,13 +390,10 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
           </div>
           ${nameStr}
           <div>
-            Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+            Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
           </div>
           <div>
             Last Scanned: ${lastScannedStr}
-          </div>
-          <div>
-            <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
           </div>
         </center>
       </div>`
@@ -405,12 +402,12 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
     str = `
       <div>
         <center>
-          <div style='padding-bottom: 2px'>
+          <!--<div style='padding-bottom: 2px'>
             Gym owned by:
-          </div>
+          </div>-->
           <div>
             <b style='color:rgba(${gymColor[teamId]})'>Team ${teamName}</b><br>
-            <img height='70px' style='padding: 5px;' src='static/forts/${teamName}_large.png'>
+            <!--<img height='70px' style='padding: 5px;' src='static/forts/${teamName}_large.png'>-->
           </div>
           <div>
             ${nameStr}
@@ -422,13 +419,12 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
             ${memberStr}
           </div>
           <div>
-            Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+            Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
           </div>
           <div>
             Last Scanned: ${lastScannedStr}
           </div>
           <div>
-            <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a> |
             <a href="javascript:showGymDetails('${gymId}')">View Details</a>
           </div>
         </center>
@@ -452,22 +448,18 @@ function pokestopLabel (expireTime, latitude, longitude) {
         <span class='label-countdown' disappears-at='${expireTime}'>(00m00s)</span>
       </div>
       <div>
-        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+        Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
       </div>
-      <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
-      </div>`
+      `
   } else {
     str = `
       <div>
         <b>Pokéstop</b>
       </div>
       <div>
-        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+        Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
       </div>
-      <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
-      </div>`
+      `
   }
 
   return str
@@ -1267,6 +1259,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
   data.done(function (result) {
     var gymLevel = getGymLevel(result.gym_points)
+    var freeSlots = gymLevel - result.pokemon.length
     var nextLvlPrestige = gymPrestige[gymLevel - 1] || 50000
     //var prestigePercentage = ((nextLvlPrestige - result.gym_points) / nextLvlPrestige) * 100
     var prestigePercentage = (result.gym_points / nextLvlPrestige) * 100
@@ -1287,7 +1280,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
           ${result.gym_points}/${nextLvlPrestige}
         </div>
         <div>
-          <b class="team-${result.team_id}-text">Level ${gymLevel}</b>
+          <b class="team-${result.team_id}-text">Level ${gymLevel} - Free Slots: ${freeSlots}</b>
         </div>
         <div style="font-size: .7em;">
           Last Scanned: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
@@ -1297,7 +1290,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
     if (result.pokemon.length) {
       $.each(result.pokemon, function (i, pokemon) {
-        var perfectPercent = Math.round((pokemon.iv_defense + pokemon.iv_attack + pokemon.iv_stamina) * 100 / 45)
+        var perfectPercent = (pokemon.iv_defense + pokemon.iv_attack + pokemon.iv_stamina) * 100 / 45
         var moveEnergy = Math.round(100 / pokemon.move_2_energy)
 
         pokemonHtml += `
@@ -1323,15 +1316,15 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
             <td colspan="2">
               <div class="ivs">
                 <div class="iv">
-                  <div class="type">DEF</div>
-                  <div class="value">
-                    ${pokemon.iv_defense}
-                  </div>
-                </div>
-                <div class="iv">
                   <div class="type">ATK</div>
                   <div class="value">
                     ${pokemon.iv_attack}
+                  </div>
+                </div>
+                <div class="iv">
+                  <div class="type">DEF</div>
+                  <div class="value">
+                    ${pokemon.iv_defense}
                   </div>
                 </div>
                 <div class="iv">
@@ -1340,7 +1333,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                     ${pokemon.iv_stamina}
                   </div>
                 </div>
-                <div class="iv" style="width: 36px;"">
+                <div class="iv" style="width: 36px;">
                   <div class="type">PERFECT</div>
                   <div class="value">
                     ${perfectPercent}<span style="font-size: .6em;">%</span>
