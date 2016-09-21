@@ -35,9 +35,10 @@ var storeZoom = true
 var scanPath
 var moves
 
-
 var selectedStyle = 'light'
 
+var updateWorker
+var lastUpdateTime
 
 var gymTypes = ['Uncontested', 'Mystic', 'Valor', 'Instinct']
 var gymPrestige = [2000, 4000, 8000, 12000, 16000, 20000, 30000, 40000, 50000]
@@ -1038,6 +1039,7 @@ function updateMap () {
     if ($('#stats').hasClass('visible')) {
       countMarkers()
     }
+    lastUpdateTime = Date.now()
   })
 }
 
@@ -1382,7 +1384,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
           <p style="font-size: .75em; margin: 5px;">
             No additional gym information is available for this gym. Make sure you are collecting <a href="https://pgm.readthedocs.io/en/develop/extras/gyminfo.html">detailed gym info.</a>
-            If you have detailed gym info collection running, this gym's Pokemon information may be out of date.
+            If you have detailed gym info collection running, this gyms Pokemon information may be out of date.
           </p>
         </center>
       `
@@ -1405,6 +1407,62 @@ function getGymLevel (points) {
   }
 
   return level
+}
+
+function updateGeoLocation () {
+  if (navigator.geolocation && (Store.get('geoLocate') || Store.get('followMyLocation'))) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      var lat = position.coords.latitude
+      var lng = position.coords.longitude
+      var center = new google.maps.LatLng(lat, lng)
+
+      if (Store.get('geoLocate')) {
+        // the search function makes any small movements cause a loop. Need to increase resolution
+        if ((typeof searchMarker !== 'undefined') && (getPointDistance(searchMarker.getPosition(), center) > 40)) {
+          $.post('next_loc?lat=' + lat + '&lon=' + lng).done(function () {
+            map.panTo(center)
+            searchMarker.setPosition(center)
+          })
+        }
+      }
+      if (Store.get('followMyLocation')) {
+        if ((typeof locationMarker !== 'undefined') && (getPointDistance(locationMarker.getPosition(), center) >= 5)) {
+          map.panTo(center)
+          locationMarker.setPosition(center)
+          Store.set('followMyLocationPosition', { lat: lat, lng: lng })
+        }
+      }
+    })
+  }
+}
+
+function createUpdateWorker () {
+  try {
+    if (isMobileDevice() && (window.Worker)) {
+      var updateBlob = new Blob([`onmessage = function(e) {
+        var data = e.data
+        if (data.name === 'backgroundUpdate') {
+          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 5000)
+        }
+      }`])
+
+      var updateBlobURL = window.URL.createObjectURL(updateBlob)
+
+      updateWorker = new Worker(updateBlobURL)
+
+      updateWorker.onmessage = function (e) {
+        var data = e.data
+        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 2500) {
+          updateMap()
+          updateGeoLocation()
+        }
+      }
+
+      updateWorker.postMessage({name: 'backgroundUpdate'})
+    }
+  } catch (ex) {
+    console.log('Webworker error: ' + ex.message)
+  }
 }
 
 //
@@ -1645,32 +1703,9 @@ $(function () {
   // run interval timers to regularly update map and timediffs
   window.setInterval(updateLabelDiffTime, 1000)
   window.setInterval(updateMap, 5000)
-  window.setInterval(function () {
-    if (navigator.geolocation && (Store.get('geoLocate') || Store.get('followMyLocation'))) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        var lat = position.coords.latitude
-        var lng = position.coords.longitude
-        var center = new google.maps.LatLng(lat, lng)
+  window.setInterval(updateGeoLocation, 1000)
 
-        if (Store.get('geoLocate')) {
-          // the search function makes any small movements cause a loop. Need to increase resolution
-          if ((typeof searchMarker !== 'undefined') && (getPointDistance(searchMarker.getPosition(), center) > 40)) {
-            $.post('next_loc?lat=' + lat + '&lon=' + lng).done(function () {
-              map.panTo(center)
-              searchMarker.setPosition(center)
-            })
-          }
-        }
-        if (Store.get('followMyLocation')) {
-          if ((typeof locationMarker !== 'undefined') && (getPointDistance(locationMarker.getPosition(), center) >= 5)) {
-            map.panTo(center)
-            locationMarker.setPosition(center)
-            Store.set('followMyLocationPosition', { lat: lat, lng: lng })
-          }
-        }
-      })
-    }
-  }, 1000)
+  createUpdateWorker()
 
   // Wipe off/restore map icons when switches are toggled
   function buildSwitchChangeListener (data, dataType, storageKey) {
