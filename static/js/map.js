@@ -1302,7 +1302,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
               <i class="pokemon-sprite n${pokemon.pokemon_id}"></i>
             </td>
             <td class="team-${result.team_id}-text">
-              <div style="line-height:1em;">${pokemon.pokemon_name}</div>
+              <div style="line-height:1em;"><a href='https://pokemongo.gamepress.gg/pokemon/${pokemon.pokemon_id}' target='_blank' title='View in Pokedex'>${pokemon.pokemon_name}</a></div>
               <div class="cp">CP ${pokemon.pokemon_cp}</div>
             </td>
             <td width="190" class="team-${result.team_id}-text" align="center">
