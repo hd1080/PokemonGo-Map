@@ -589,7 +589,8 @@ function setupGymMarker (item) {
       lng: item['longitude']
     },
     map: map,
-    icon: 'static/forts/' + gymTypes[item['team_id']] + '.png'
+    icon: 'static/forts/' + gymTypes[item['team_id']] + '.png',
+    url: 'javascript:showGymDetails(' + item['gym_id'] + ')'
   })
 
   if (!marker.rangeCircle && isRangeActive(map)) {
@@ -760,10 +761,15 @@ function clearSelection () {
 
 function addListeners (marker) {
   marker.addListener('click', function () {
-    marker.infoWindow.open(map, marker)
-    clearSelection()
-    updateLabelDiffTime()
-    marker.persist = true
+    if (!isMobileDevice()) {
+      window.location.href = this.url;
+    }
+    else {
+      marker.infoWindow.open(map, marker)
+      clearSelection()
+      updateLabelDiffTime()
+      marker.persist = true
+    }
   })
 
   google.maps.event.addListener(marker.infoWindow, 'closeclick', function () {
