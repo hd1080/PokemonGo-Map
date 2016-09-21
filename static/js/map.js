@@ -1337,7 +1337,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                   </div>
                 </div>
                 <div class="iv" style="width: 36px;">
-                  <div class="type">PERFECT</div>
+                  <div class="type">IV</div>
                   <div class="value">
                     ${perfectPercent}<span style="font-size: .6em;">%</span>
                   </div>
