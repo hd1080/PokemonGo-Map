@@ -760,10 +760,17 @@ function clearSelection () {
 
 function addListeners (marker) {
   marker.addListener('click', function () {
-    marker.infoWindow.open(map, marker)
-    clearSelection()
-    updateLabelDiffTime()
-    marker.persist = true
+    if (!marker.infoWindowIsOpen) {
+      marker.infoWindow.open(map, marker)
+      clearSelection()
+      updateLabelDiffTime()
+      marker.persist = true
+      marker.infoWindowIsOpen = true
+    } else {
+      marker.persist = null
+      marker.infoWindow.close()
+      marker.infoWindowIsOpen = false
+    }
   })
 
   google.maps.event.addListener(marker.infoWindow, 'closeclick', function () {
@@ -1695,7 +1702,7 @@ $(function () {
     $selectRarityNotify.val(Store.get('remember_select_rarity_notify')).trigger('change')
     $textPerfectionNotify.val(Store.get('remember_text_perfection_notify')).trigger('change')
 
-    if (isTouchDevice()) {
+    if (isTouchDevice() && isMobileDevice()) {
       $('.select2-search input').prop('readonly', true)
     }
   })
