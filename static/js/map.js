@@ -322,11 +322,11 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
   var details = ''
   if (atk != null) {
     var iv = (atk + def + sta) / 45 * 100
-    if (IV > 90) {
-      stringIV = `IV: <b>${iv.toFixed(1)}%</b> (${atk}/${def}/${sta})`
+    if (iv > 90) {
+      var stringIV = `IV: <b>${iv.toFixed(1)}%</b> (${atk}/${def}/${sta})`
     }
     else {
-      stringIV = `IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})`
+      var stringIV = `IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})`
     }
     details = `
       <div>
