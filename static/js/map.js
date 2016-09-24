@@ -1306,7 +1306,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
     if (result.pokemon.length) {
       $.each(result.pokemon, function (i, pokemon) {
-        var perfectPercent = Math.round((pokemon.iv_defense + pokemon.iv_attack + pokemon.iv_stamina) * 100 / 45).toFixed(1)
+        var perfectPercent = ((pokemon.iv_defense + pokemon.iv_attack + pokemon.iv_stamina) * 100 / 45).toFixed(1)
         var moveEnergy = Math.round(100 / pokemon.move_2_energy)
 
         pokemonHtml += `
