@@ -322,9 +322,15 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
   var details = ''
   if (atk != null) {
     var iv = (atk + def + sta) / 45 * 100
+    if (IV > 90) {
+      stringIV = `IV: <b>${iv.toFixed(1)}%</b> (${atk}/${def}/${sta})`
+    }
+    else {
+      stringIV = `IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})`
+    }
     details = `
       <div>
-        IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})
+        ${stringIV}
       </div>
       <div>
         Moves: ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
@@ -1300,7 +1306,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
     if (result.pokemon.length) {
       $.each(result.pokemon, function (i, pokemon) {
-        var perfectPercent = Math.round((pokemon.iv_defense + pokemon.iv_attack + pokemon.iv_stamina) * 100 / 45)
+        var perfectPercent = Math.round((pokemon.iv_defense + pokemon.iv_attack + pokemon.iv_stamina) * 100 / 45).toFixed(1)
         var moveEnergy = Math.round(100 / pokemon.move_2_energy)
 
         pokemonHtml += `
