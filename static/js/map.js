@@ -1,4 +1,4 @@
-//
+﻿//
 // Global map.js variables
 //
 
@@ -11,6 +11,7 @@ var $selectIconResolution
 var $selectIconSize
 var $selectLuredPokestopsOnly
 var $selectSearchIconMarker
+var $selectGymMarkerStyle
 var $selectLocationIconMarker
 
 var language = document.documentElement.lang === '' ? 'en' : document.documentElement.lang
@@ -43,6 +44,7 @@ var lastUpdateTime
 var gymTypes = ['Uncontested', 'Mystic', 'Valor', 'Instinct']
 var gymPrestige = [2000, 4000, 8000, 12000, 16000, 20000, 30000, 40000, 50000]
 var audio = new Audio('static/sounds/ding.mp3')
+
 
 //
 // Functions
@@ -442,6 +444,15 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
   return str
 }
 
+function getGymLevel (points) {
+  var level = 1
+  while (points >= gymPrestige[level - 1]) {
+    level++
+  }
+
+  return level
+}
+
 function pokestopLabel (expireTime, latitude, longitude) {
   var str
   if (expireTime) {
@@ -595,7 +606,7 @@ function setupGymMarker (item) {
       lng: item['longitude']
     },
     map: map,
-    icon: 'static/forts/' + gymTypes[item['team_id']] + '.png'
+    icon: {url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + (item['team_id'] !== 0 ? '_' + getGymLevel(item['gym_points']) : '') + '.png', scaledSize: new google.maps.Size(48, 48)}
   })
 
   if (!marker.rangeCircle && isRangeActive(map)) {
@@ -612,9 +623,14 @@ function setupGymMarker (item) {
 }
 
 function updateGymMarker (item, marker) {
-  marker.setIcon('static/forts/' + gymTypes[item['team_id']] + '.png')
-  marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['name'], item['pokemon'], item['gym_id']))
+  marker.setIcon({url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + (item['team_id'] !== 0 ? '_' + getGymLevel(item['gym_points']) : '') + '.png', scaledSize: new google.maps.Size(48, 48)})
+  marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['name'], item['pokemon']))
   return marker
+}
+function updateGymIcons () {
+  $.each(mapData.gyms, function (key, value) {
+    mapData.gyms[key]['marker'].setIcon({url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[mapData.gyms[key]['team_id']] + (mapData.gyms[key]['team_id'] !== 0 ? '_' + getGymLevel(mapData.gyms[key]['gym_points']) : '') + '.png', scaledSize: new google.maps.Size(48, 48)})
+  })
 }
 
 function setupPokestopMarker (item) {
@@ -1050,7 +1066,7 @@ function updateMap () {
 //    drawScanPath(result.scanned);
     clearStaleMarkers()
     if ($('#stats').hasClass('visible')) {
-      countMarkers()
+      countMarkers(map)
     }
     lastUpdateTime = Date.now()
   })
@@ -1607,6 +1623,20 @@ $(function () {
 
     $selectLocationIconMarker.val(Store.get('locationMarkerStyle')).trigger('change')
   })
+
+  $selectGymMarkerStyle = $('#gym-marker-style')
+
+  $selectGymMarkerStyle.select2({
+    placeholder: 'Select Style',
+    minimumResultsForSearch: Infinity
+  })
+
+  $selectGymMarkerStyle.on('change', function (e) {
+    Store.set('gymMarkerStyle', this.value)
+    updateGymIcons()
+  })
+
+  $selectGymMarkerStyle.val(Store.get('gymMarkerStyle')).trigger('change')
 })
 
 $(function () {
@@ -1808,4 +1838,24 @@ $(function () {
       heightStyle: 'content'
     })
   }
+
+  // Initialize dataTable in statistics sidebar
+  //   - turn off sorting for the 'icon' column
+  //   - initially sort 'name' column alphabetically
+
+  $('#pokemonList_table').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    errMode: 'throw',
+    'language': {
+      'emptyTable': ''
+    },
+    'columns': [
+      { 'orderable': false },
+      null,
+      null,
+      null
+    ]
+  }).order([1, 'asc'])
 })
