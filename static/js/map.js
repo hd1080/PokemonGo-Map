@@ -354,9 +354,9 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
       Disappears at ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
       <span class='label-countdown' disappears-at='${disappearTime}'>(00m00s)</span>
     </div>
-    <div>
+    <!--<div>
       Location: <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a>
-    </div>
+    </div>-->
       ${details}
     <div>
       <a href='javascript:excludePokemon(${id})'>Exclude</a>&nbsp;&nbsp
